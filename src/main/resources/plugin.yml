@@ -1,0 +1,6 @@
+name: ItemLog
+version: '1.0.0-SNAPSHOT'
+main: com.itemlog.ItemLogPlugin
+api-version: '1.21'
+author: you
+description: Reusable backend — records item lifecycle events for audit & restore.
