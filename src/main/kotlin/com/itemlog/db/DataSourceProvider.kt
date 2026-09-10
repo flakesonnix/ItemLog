@@ -11,7 +11,7 @@ class DataSourceProvider(private val plugin: JavaPlugin) {
 
     fun getDataSource(): DataSource {
         if (ds != null && !ds!!.isClosed) return ds!!
-        val type = plugin.config.getString("database.type", "sqlite")
+        val type = plugin.config.getString("database.type") ?: "sqlite"
         val cfg = HikariConfig().apply {
             poolName = "ItemLog-Hikari"
             maximumPoolSize = plugin.config.getInt("database.pool.maximum-pool-size", 10)
@@ -26,20 +26,20 @@ class DataSourceProvider(private val plugin: JavaPlugin) {
                 val user = plugin.config.getString("database.mysql.user", "root")!!
                 val pass = plugin.config.getString("database.mysql.password", "")!!
                 val params = plugin.config.getString("database.mysql.params", "useSSL=false&allowPublicKeyRetrieval=true")!!
-                jdbcUrl = "jdbc:mysql://$host:$port/$db?$params"
-                username = user
-                password = pass
-                driverClassName = "com.mysql.cj.jdbc.Driver"
+                cfg.jdbcUrl = "jdbc:mysql://$host:$port/$db?$params"
+                cfg.username = user
+                cfg.password = pass
+                cfg.driverClassName = "com.mysql.cj.jdbc.Driver"
             }
             else -> {
                 val fileName = plugin.config.getString("database.sqlite.file", "database.db")!!
                 val file = File(plugin.dataFolder, fileName)
                 file.parentFile?.mkdirs()
-                jdbcUrl = "jdbc:sqlite:${file.absolutePath}"
-                driverClassName = "org.sqlite.JDBC"
-                maximumPoolSize = 1
-                minimumIdle = 1
-                connectionTestQuery = "SELECT 1"
+                cfg.jdbcUrl = "jdbc:sqlite:${file.absolutePath}"
+                cfg.driverClassName = "org.sqlite.JDBC"
+                cfg.maximumPoolSize = 1
+                cfg.minimumIdle = 1
+                cfg.connectionTestQuery = "SELECT 1"
             }
         }
 

@@ -14,7 +14,7 @@ import java.util.stream.Collectors
 class MigrationRunner(private val ds: DataSource) {
 
     fun migrate() {
-        try (val c = ds.connection) {
+        ds.connection.use { c ->
             // ensure migrations table exists (for fresh DB)
             c.createStatement().use { s ->
                 s.execute("CREATE TABLE IF NOT EXISTS schema_migrations (version INT PRIMARY KEY, applied_at BIGINT NOT NULL)")
