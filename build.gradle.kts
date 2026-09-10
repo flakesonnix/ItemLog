@@ -1,5 +1,5 @@
 plugins {
-    java
+    kotlin("jvm") version "2.0.21"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     idea
 }
@@ -16,21 +16,34 @@ val paperVersion = "1.21.10-R0.1-SNAPSHOT"
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:$paperVersion")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib")
     implementation("com.zaxxer:HikariCP:6.2.1")
     implementation("org.xerial:sqlite-jdbc:3.47.1.0")
     implementation("com.mysql:mysql-connector-j:9.2.0")
     // tests
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.3")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.11.3")
+    testImplementation("io.mockk:mockk:1.13.12")
+    testImplementation("io.papermc.paper:paper-api:$paperVersion")
 }
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
+kotlin {
+    jvmToolchain(21)
+}
+
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
     options.release.set(21)
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21)
+    }
 }
 
 tasks.processResources {

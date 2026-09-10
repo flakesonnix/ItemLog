@@ -1,6 +1,6 @@
-package com.itemlog.model;
+package com.itemlog.model
 
-public enum EventType {
+enum class EventType {
     PICKUP, DROP,
     INVENTORY_ADD, INVENTORY_REMOVE,
     CONTAINER_INSERT, CONTAINER_REMOVE,
