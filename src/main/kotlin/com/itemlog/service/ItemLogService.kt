@@ -1,27 +1,40 @@
 package com.itemlog.service
 
-import com.itemlog.db.DataSourceProvider
+import com.itemlog.model.EventType
 import com.itemlog.model.ItemEvent
 import com.itemlog.model.ItemSnapshot
 import com.itemlog.model.LocationData
-import com.itemlog.model.EventType
+import com.itemlog.repository.ItemEventRepository
 import com.itemlog.serialization.ItemSerializer
-import org.bukkit.plugin.java.JavaPlugin
-import org.bukkit.inventory.ItemStack
 import org.bukkit.Location
+import org.bukkit.inventory.ItemStack
+import org.bukkit.plugin.java.JavaPlugin
 import java.util.UUID
 
 class ItemLogService(
     private val plugin: JavaPlugin,
-    private val serializer: ItemSerializer
+    private val serializer: ItemSerializer,
+    private val repository: ItemEventRepository
 ) {
+    private val buffer = EventBuffer(plugin, repository)
+
+    fun start() = buffer.start()
+    fun stop() = buffer.stop()
+
+    fun log(event: ItemEvent) {
+        // must be called on main thread, but persists async via buffer
+        buffer.add(event)
+    }
+
+    // Ensure ordering: timestamp is set at event creation, not flush time
+
     fun logPickup(playerId: UUID, location: Location, item: ItemStack) {
         val event = ItemEvent(
             eventId = UUID.randomUUID(),
-            type = com.itemlog.model.EventType.PICKUP,
+            type = EventType.PICKUP,
             timestamp = System.currentTimeMillis(),
             playerId = playerId,
-            location = com.itemlog.model.LocationData.from(location),
+            location = LocationData.from(location),
             before = null,
             after = ItemSnapshot(
                 material = item.type.name,
@@ -30,16 +43,16 @@ class ItemLogService(
             ),
             source = "PLAYER_PICKUP"
         )
-        // TODO: persist to DB
+        log(event)
     }
 
     fun logDrop(playerId: UUID, location: Location, item: ItemStack) {
         val event = ItemEvent(
             eventId = UUID.randomUUID(),
-            type = com.itemlog.model.EventType.DROP,
+            type = EventType.DROP,
             timestamp = System.currentTimeMillis(),
             playerId = playerId,
-            location = com.itemlog.model.LocationData.from(location),
+            location = LocationData.from(location),
             before = ItemSnapshot(
                 material = item.type.name,
                 amount = item.amount,
@@ -48,6 +61,9 @@ class ItemLogService(
             after = null,
             source = "PLAYER_DROP"
         )
-        // TODO: persist to DB
+        log(event)
     }
+
+    // For testing: flush synchronously
+    fun flush() = buffer.flush()
 }
