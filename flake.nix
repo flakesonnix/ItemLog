@@ -13,7 +13,7 @@
         gradle = pkgs.gradle_8;
       in {
         devShells.default = pkgs.mkShell {
-          buildInputs = [ jdk gradle pkgs.git ];
+          buildInputs = [ jdk gradle pkgs.git pkgs.nixfmt ];
           shellHook = ''
             export JAVA_HOME=${jdk}
             echo "ItemLog — java $(java -version 2>&1 | head -n1) | gradle $(gradle --version | grep Gradle)"
