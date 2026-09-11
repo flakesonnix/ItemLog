@@ -38,6 +38,10 @@ jobs:
         with:
           cache-read-only: false
 
+      - name: Run tests
+        run: nix develop --accept-flake-config --command gradle test --no-daemon
+        continue-on-error: true # tests may need Paper env
+
       - name: Nix flake check
         run: nix flake check --accept-flake-config
 
@@ -61,8 +65,8 @@ jobs:
         uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: template-plugin
-          path: build/libs/*.jar
+          name: ItemLog-${{ github.sha }}
+          path: build/libs/itemlog-*.jar
           if-no-files-found: warn
 
       - name: Upload nix result (if built)

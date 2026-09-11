@@ -207,6 +207,51 @@ class ItemEventRepository(private val ds: DataSource) {
         return bb.array()
     }
 
+    fun count(filter: Filter): Long {
+        val sql = StringBuilder("SELECT COUNT(*) FROM item_events WHERE 1=1")
+        val params = mutableListOf<Any?>()
+        if (filter.playerId != null) {
+            sql.append(" AND player_uuid = ?")
+            params.add(uuidToBytes(filter.playerId))
+        }
+        if (filter.eventType != null) {
+            sql.append(" AND event_type = ?")
+            params.add(filter.eventType.name)
+        }
+        if (filter.fromTime != null) {
+            sql.append(" AND timestamp >= ?")
+            params.add(filter.fromTime)
+        }
+        if (filter.toTime != null) {
+            sql.append(" AND timestamp <= ?")
+            params.add(filter.toTime)
+        }
+        ds.connection.use { c ->
+            c.prepareStatement(sql.toString()).use { ps ->
+                for ((i, p) in params.withIndex()) {
+                    when (p) {
+                        is ByteArray -> ps.setBytes(i + 1, p)
+                        is String -> ps.setString(i + 1, p)
+                        is Long -> ps.setLong(i + 1, p)
+                    }
+                }
+                ps.executeQuery().use { rs ->
+                    if (rs.next()) return rs.getLong(1)
+                }
+            }
+        }
+        return 0
+    }
+
+    fun deleteBefore(cutoff: Long): Int {
+        ds.connection.use { c ->
+            c.prepareStatement("DELETE FROM item_events WHERE timestamp < ?").use { ps ->
+                ps.setLong(1, cutoff)
+                return ps.executeUpdate()
+            }
+        }
+    }
+
     private fun bytesToUuid(bytes: ByteArray): UUID {
         val bb = ByteBuffer.wrap(bytes)
         return UUID(bb.long, bb.long)
