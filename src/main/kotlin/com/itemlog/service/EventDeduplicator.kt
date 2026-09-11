@@ -22,7 +22,5 @@ class EventDeduplicator(private val windowMs: Long = 50) {
         return false
     }
 
-    fun key(playerId: String?, type: String, material: String, amount: Int): String {
-        return "$playerId|$type|$material|$amount"
-    }
+    fun key(playerId: String?, type: String, material: String, amount: Int): String = "$playerId|$type|$material|$amount"
 }

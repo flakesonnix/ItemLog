@@ -2,16 +2,17 @@ package com.itemlog.service
 
 import com.itemlog.model.ItemEvent
 import com.itemlog.repository.ItemEventRepository
-import org.bukkit.plugin.java.JavaPlugin
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.logging.Level
+import org.bukkit.plugin.java.JavaPlugin
 
 class EventBuffer(
     private val plugin: JavaPlugin,
     private val repository: ItemEventRepository,
     private val batchSize: Int = 100,
-    private val flushIntervalTicks: Long = 20L // 1s
+    // 1s
+    private val flushIntervalTicks: Long = 20L,
 ) {
     private val queue = ConcurrentLinkedQueue<ItemEvent>()
     private val flushing = AtomicBoolean(false)

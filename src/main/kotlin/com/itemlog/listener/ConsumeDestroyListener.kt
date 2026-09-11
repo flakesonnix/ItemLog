@@ -6,18 +6,18 @@ import com.itemlog.model.ItemSnapshot
 import com.itemlog.model.LocationData
 import com.itemlog.serialization.ItemSerializer
 import com.itemlog.service.ItemLogService
+import java.util.UUID
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
-import org.bukkit.event.player.PlayerItemConsumeEvent
-import org.bukkit.event.player.PlayerItemBreakEvent
 import org.bukkit.event.entity.ItemDespawnEvent
+import org.bukkit.event.player.PlayerItemBreakEvent
+import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerItemDamageEvent
-import java.util.UUID
 
 class ConsumeDestroyListener(
     private val service: ItemLogService,
-    private val serializer: ItemSerializer
+    private val serializer: ItemSerializer,
 ) : Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -33,7 +33,7 @@ class ConsumeDestroyListener(
             location = LocationData.from(player.location),
             before = before,
             after = null,
-            source = "CONSUME"
+            source = "CONSUME",
         )
         service.log(e)
     }
@@ -51,7 +51,7 @@ class ConsumeDestroyListener(
             location = LocationData.from(player.location),
             before = before,
             after = null,
-            source = "BREAK"
+            source = "BREAK",
         )
         service.log(e)
     }
@@ -69,7 +69,7 @@ class ConsumeDestroyListener(
             location = loc,
             before = before,
             after = null,
-            source = "DESPAWN"
+            source = "DESPAWN",
         )
         service.log(e)
     }
@@ -89,7 +89,7 @@ class ConsumeDestroyListener(
             location = LocationData.from(player.location),
             before = before,
             after = null,
-            source = "DAMAGE"
+            source = "DAMAGE",
         )
         service.log(e)
     }

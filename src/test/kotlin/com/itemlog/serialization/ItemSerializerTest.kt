@@ -1,12 +1,8 @@
 package com.itemlog.serialization
 
-import com.itemlog.model.ItemSnapshot
-import io.mockk.every
-import io.mockk.mockk
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.ItemMeta
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull

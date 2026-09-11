@@ -1,7 +1,7 @@
 package com.itemlog.model
 
-import org.jetbrains.annotations.Nullable
 import java.util.UUID
+import org.jetbrains.annotations.Nullable
 
 data class ItemEvent(
     val eventId: UUID,
@@ -11,7 +11,7 @@ data class ItemEvent(
     @Nullable val location: LocationData?,
     @Nullable val before: ItemSnapshot?,
     @Nullable val after: ItemSnapshot?,
-    @Nullable val source: String?
+    @Nullable val source: String?,
 ) {
     val material: String?
         get() = before?.material ?: after?.material

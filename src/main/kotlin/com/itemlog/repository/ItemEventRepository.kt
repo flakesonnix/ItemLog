@@ -5,7 +5,6 @@ import com.itemlog.model.ItemEvent
 import com.itemlog.model.ItemSnapshot
 import com.itemlog.model.LocationData
 import java.nio.ByteBuffer
-import java.sql.Connection
 import java.util.UUID
 import javax.sql.DataSource
 
@@ -15,10 +14,10 @@ class ItemEventRepository(private val ds: DataSource) {
         ds.connection.use { c ->
             c.prepareStatement(
                 """
-                INSERT INTO item_events 
+                INSERT INTO item_events
                 (event_id, event_type, timestamp, player_uuid, world, x, y, z, yaw, pitch, material, before_json, after_json, source)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """.trimIndent()
+                """.trimIndent(),
             ).use { ps ->
                 ps.setBytes(1, uuidToBytes(event.eventId))
                 ps.setString(2, event.type.name)
@@ -54,10 +53,10 @@ class ItemEventRepository(private val ds: DataSource) {
             try {
                 c.prepareStatement(
                     """
-                    INSERT INTO item_events 
+                    INSERT INTO item_events
                     (event_id, event_type, timestamp, player_uuid, world, x, y, z, yaw, pitch, material, before_json, after_json, source)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    """.trimIndent()
+                    """.trimIndent(),
                 ).use { ps ->
                     for (event in events) {
                         ps.setBytes(1, uuidToBytes(event.eventId))
@@ -113,12 +112,12 @@ class ItemEventRepository(private val ds: DataSource) {
         val eventType: EventType? = null,
         val fromTime: Long? = null,
         val toTime: Long? = null,
-        val material: String? = null
+        val material: String? = null,
     )
 
     data class Pagination(
         val limit: Int = 50,
-        val offset: Int = 0
+        val offset: Int = 0,
     )
 
     fun find(filter: Filter, pagination: Pagination): List<ItemEvent> {

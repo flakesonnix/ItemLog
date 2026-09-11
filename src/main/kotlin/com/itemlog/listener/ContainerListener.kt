@@ -6,6 +6,7 @@ import com.itemlog.model.ItemSnapshot
 import com.itemlog.model.LocationData
 import com.itemlog.serialization.ItemSerializer
 import com.itemlog.service.ItemLogService
+import java.util.UUID
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -13,11 +14,10 @@ import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryMoveItemEvent
 import org.bukkit.event.inventory.InventoryType
-import java.util.UUID
 
 class ContainerListener(
     private val service: ItemLogService,
-    private val serializer: ItemSerializer
+    private val serializer: ItemSerializer,
 ) : Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -41,7 +41,7 @@ class ContainerListener(
             location = loc,
             before = before,
             after = after,
-            source = inv.type.name
+            source = inv.type.name,
         )
         service.log(e)
     }
@@ -59,7 +59,7 @@ class ContainerListener(
             location = loc,
             before = ItemSnapshot(item.type.name, item.amount, serializer.serialize(item)),
             after = null,
-            source = "HOPPER:${event.destination.type.name}"
+            source = "HOPPER:${event.destination.type.name}",
         )
         service.log(e)
     }

@@ -5,16 +5,16 @@ import com.itemlog.model.Restoration
 import com.itemlog.repository.ItemEventRepository
 import com.itemlog.repository.RestorationRepository
 import com.itemlog.serialization.ItemSerializer
+import java.util.UUID
 import org.bukkit.Location
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
-import java.util.UUID
 
 class RestorationService(
     private val plugin: JavaPlugin,
     private val eventRepo: ItemEventRepository,
     private val restorationRepo: RestorationRepository,
-    private val serializer: ItemSerializer
+    private val serializer: ItemSerializer,
 ) {
 
     sealed class Result {
@@ -62,7 +62,7 @@ class RestorationService(
             timestamp = System.currentTimeMillis(),
             restoreLocation = locData,
             resultJson = snapshot.itemJson,
-            status = if (given) "SUCCESS" else "PARTIAL"
+            status = if (given) "SUCCESS" else "PARTIAL",
         )
         try {
             restorationRepo.insert(restoration)

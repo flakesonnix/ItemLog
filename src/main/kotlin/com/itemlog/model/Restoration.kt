@@ -1,7 +1,7 @@
 package com.itemlog.model
 
-import org.jetbrains.annotations.Nullable
 import java.util.UUID
+import org.jetbrains.annotations.Nullable
 
 data class Restoration(
     val restorationId: UUID,
@@ -11,5 +11,5 @@ data class Restoration(
     val timestamp: Long,
     @Nullable val restoreLocation: LocationData?,
     @Nullable val resultJson: String?,
-    val status: String
+    val status: String,
 )

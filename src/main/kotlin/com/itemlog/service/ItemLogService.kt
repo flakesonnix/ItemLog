@@ -6,15 +6,15 @@ import com.itemlog.model.ItemSnapshot
 import com.itemlog.model.LocationData
 import com.itemlog.repository.ItemEventRepository
 import com.itemlog.serialization.ItemSerializer
+import java.util.UUID
 import org.bukkit.Location
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
-import java.util.UUID
 
 class ItemLogService(
     private val plugin: JavaPlugin,
     private val serializer: ItemSerializer,
-    private val repository: ItemEventRepository
+    private val repository: ItemEventRepository,
 ) {
     private val buffer = EventBuffer(plugin, repository)
 
@@ -39,9 +39,9 @@ class ItemLogService(
             after = ItemSnapshot(
                 material = item.type.name,
                 amount = item.amount,
-                itemJson = serializer.serialize(item)
+                itemJson = serializer.serialize(item),
             ),
-            source = "PLAYER_PICKUP"
+            source = "PLAYER_PICKUP",
         )
         log(event)
     }
@@ -56,10 +56,10 @@ class ItemLogService(
             before = ItemSnapshot(
                 material = item.type.name,
                 amount = item.amount,
-                itemJson = serializer.serialize(item)
+                itemJson = serializer.serialize(item),
             ),
             after = null,
-            source = "PLAYER_DROP"
+            source = "PLAYER_DROP",
         )
         log(event)
     }

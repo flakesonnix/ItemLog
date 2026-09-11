@@ -1,21 +1,15 @@
 package com.itemlog.serialization
 
-import org.bukkit.Material
-import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.ItemMeta
-import org.bukkit.enchantments.Enchantment
-import org.bukkit.attribute.Attribute
-import org.bukkit.attribute.AttributeModifier
-import org.bukkit.inventory.meta.Damageable
-import org.bukkit.NamespacedKey
-import org.bukkit.inventory.EquipmentSlotGroup
-import org.jetbrains.annotations.Nullable
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.google.gson.JsonObject
-import com.google.gson.JsonElement
-import com.google.gson.JsonParser
 import com.google.gson.JsonArray
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
+import org.bukkit.Material
+import org.bukkit.NamespacedKey
+import org.bukkit.enchantments.Enchantment
+import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.Damageable
+import org.jetbrains.annotations.Nullable
 
 /**
  * Serializes ItemStack to JSON and back, preserving all metadata:

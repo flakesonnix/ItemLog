@@ -6,16 +6,16 @@ import com.itemlog.model.ItemSnapshot
 import com.itemlog.model.LocationData
 import com.itemlog.serialization.ItemSerializer
 import com.itemlog.service.ItemLogService
+import java.util.UUID
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.event.inventory.FurnaceExtractEvent
-import java.util.UUID
 
 class CraftSmeltListener(
     private val service: ItemLogService,
-    private val serializer: ItemSerializer
+    private val serializer: ItemSerializer,
 ) : Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -31,7 +31,7 @@ class CraftSmeltListener(
             location = LocationData.from(player.location),
             before = null,
             after = before,
-            source = "CRAFT"
+            source = "CRAFT",
         )
         service.log(e)
     }
@@ -49,7 +49,7 @@ class CraftSmeltListener(
             location = LocationData.from(player.location),
             before = null,
             after = after,
-            source = "FURNACE"
+            source = "FURNACE",
         )
         service.log(e)
     }

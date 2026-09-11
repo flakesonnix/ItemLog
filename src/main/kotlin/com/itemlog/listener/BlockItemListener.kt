@@ -7,17 +7,17 @@ import com.itemlog.model.LocationData
 import com.itemlog.serialization.ItemSerializer
 import com.itemlog.service.EventDeduplicator
 import com.itemlog.service.ItemLogService
+import java.util.UUID
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockDropItemEvent
 import org.bukkit.event.entity.ItemSpawnEvent
-import java.util.UUID
 
 class BlockItemListener(
     private val service: ItemLogService,
     private val serializer: ItemSerializer,
-    private val deduplicator: EventDeduplicator
+    private val deduplicator: EventDeduplicator,
 ) : Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -37,7 +37,7 @@ class BlockItemListener(
                 location = loc,
                 before = snapshot,
                 after = null,
-                source = "BLOCK_BREAK:${event.block.type.name}"
+                source = "BLOCK_BREAK:${event.block.type.name}",
             )
             service.log(e)
         }
@@ -61,7 +61,7 @@ class BlockItemListener(
             location = loc,
             before = null,
             after = snapshot,
-            source = "ITEM_SPAWN"
+            source = "ITEM_SPAWN",
         )
         service.log(e)
     }

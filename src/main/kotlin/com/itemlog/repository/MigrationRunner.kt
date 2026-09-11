@@ -1,15 +1,11 @@
 package com.itemlog.repository
 
-import javax.sql.DataSource
 import java.io.BufferedReader
-import java.io.InputStream
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import java.sql.Connection
-import java.sql.PreparedStatement
-import java.sql.ResultSet
-import java.sql.Statement
 import java.util.stream.Collectors
+import javax.sql.DataSource
 
 class MigrationRunner(private val ds: DataSource) {
 
@@ -52,11 +48,9 @@ class MigrationRunner(private val ds: DataSource) {
         }
     }
 
-    private fun currentVersion(c: Connection): Int {
-        return c.createStatement().use { s ->
-            s.executeQuery("SELECT MAX(version) FROM schema_migrations").use { rs ->
-                if (rs.next()) rs.getInt(1) else 0
-            }
+    private fun currentVersion(c: Connection): Int = c.createStatement().use { s ->
+        s.executeQuery("SELECT MAX(version) FROM schema_migrations").use { rs ->
+            if (rs.next()) rs.getInt(1) else 0
         }
     }
 }

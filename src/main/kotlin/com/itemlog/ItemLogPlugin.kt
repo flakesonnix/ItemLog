@@ -9,15 +9,15 @@ import com.itemlog.listener.DeathListener
 import com.itemlog.listener.DropListener
 import com.itemlog.listener.InventoryListener
 import com.itemlog.listener.PickupListener
-import com.itemlog.service.EventDeduplicator
 import com.itemlog.repository.ItemEventRepository
 import com.itemlog.repository.MigrationRunner
 import com.itemlog.repository.RestorationRepository
 import com.itemlog.serialization.ItemSerializer
+import com.itemlog.service.EventDeduplicator
 import com.itemlog.service.ItemLogService
 import com.itemlog.service.RestorationService
-import org.bukkit.plugin.java.JavaPlugin
 import javax.sql.DataSource
+import org.bukkit.plugin.java.JavaPlugin
 
 class ItemLogPlugin : JavaPlugin() {
     private lateinit var provider: DataSourceProvider

@@ -6,15 +6,15 @@ import com.itemlog.model.ItemSnapshot
 import com.itemlog.model.LocationData
 import com.itemlog.serialization.ItemSerializer
 import com.itemlog.service.ItemLogService
+import java.util.UUID
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.PlayerDeathEvent
-import java.util.UUID
 
 class DeathListener(
     private val service: ItemLogService,
-    private val serializer: ItemSerializer
+    private val serializer: ItemSerializer,
 ) : Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -34,7 +34,7 @@ class DeathListener(
                 location = loc,
                 before = snapshot,
                 after = null,
-                source = "DEATH"
+                source = "DEATH",
             )
             service.log(e)
         }
@@ -50,7 +50,7 @@ class DeathListener(
                 location = loc,
                 before = snapshot,
                 after = snapshot,
-                source = "DEATH_KEEP"
+                source = "DEATH_KEEP",
             )
             service.log(e)
         }

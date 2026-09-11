@@ -12,10 +12,10 @@ class RestorationRepository(private val ds: DataSource) {
         ds.connection.use { c ->
             c.prepareStatement(
                 """
-                INSERT INTO restorations 
+                INSERT INTO restorations
                 (restoration_id, event_id, admin_uuid, target_uuid, timestamp, world, x, y, z, yaw, pitch, result_json, status)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """.trimIndent()
+                """.trimIndent(),
             ).use { ps ->
                 ps.setBytes(1, uuidToBytes(r.restorationId))
                 ps.setBytes(2, uuidToBytes(r.eventId))
@@ -51,10 +51,18 @@ class RestorationRepository(private val ds: DataSource) {
                     val list = mutableListOf<Restoration>()
                     while (rs.next()) {
                         val world = rs.getString("world")
-                        val loc = if (world != null) LocationData(
-                            world, rs.getDouble("x"), rs.getDouble("y"), rs.getDouble("z"),
-                            rs.getFloat("yaw"), rs.getFloat("pitch")
-                        ) else null
+                        val loc = if (world != null) {
+                            LocationData(
+                                world,
+                                rs.getDouble("x"),
+                                rs.getDouble("y"),
+                                rs.getDouble("z"),
+                                rs.getFloat("yaw"),
+                                rs.getFloat("pitch"),
+                            )
+                        } else {
+                            null
+                        }
                         list.add(
                             Restoration(
                                 bytesToUuid(rs.getBytes("restoration_id")),
@@ -64,8 +72,8 @@ class RestorationRepository(private val ds: DataSource) {
                                 rs.getLong("timestamp"),
                                 loc,
                                 rs.getString("result_json"),
-                                rs.getString("status")
-                            )
+                                rs.getString("status"),
+                            ),
                         )
                     }
                     return list
