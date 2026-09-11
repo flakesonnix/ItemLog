@@ -1,12 +1,17 @@
 package com.itemlog
 
 import com.itemlog.db.DataSourceProvider
+import com.itemlog.listener.ContainerListener
+import com.itemlog.listener.CraftSmeltListener
+import com.itemlog.listener.DeathListener
 import com.itemlog.listener.DropListener
 import com.itemlog.listener.PickupListener
 import com.itemlog.repository.ItemEventRepository
 import com.itemlog.repository.MigrationRunner
+import com.itemlog.repository.RestorationRepository
 import com.itemlog.serialization.ItemSerializer
 import com.itemlog.service.ItemLogService
+import com.itemlog.service.RestorationService
 import org.bukkit.plugin.java.JavaPlugin
 import javax.sql.DataSource
 
@@ -14,6 +19,8 @@ class ItemLogPlugin : JavaPlugin() {
     private lateinit var provider: DataSourceProvider
     private lateinit var dataSource: DataSource
     lateinit var itemLogService: ItemLogService
+        private set
+    lateinit var restorationService: RestorationService
         private set
 
     override fun onEnable() {
@@ -31,11 +38,16 @@ class ItemLogPlugin : JavaPlugin() {
         }
         val serializer = ItemSerializer()
         val repository = ItemEventRepository(dataSource)
+        val restorationRepo = RestorationRepository(dataSource)
         itemLogService = ItemLogService(this, serializer, repository)
+        restorationService = RestorationService(this, repository, restorationRepo, serializer)
         itemLogService.start()
         server.pluginManager.registerEvents(PickupListener(itemLogService), this)
         server.pluginManager.registerEvents(DropListener(itemLogService), this)
-        logger.info("ItemLog Stage 4 ready — Pickup/Drop listeners")
+        server.pluginManager.registerEvents(DeathListener(itemLogService, serializer), this)
+        server.pluginManager.registerEvents(ContainerListener(itemLogService, serializer), this)
+        server.pluginManager.registerEvents(CraftSmeltListener(itemLogService, serializer), this)
+        logger.info("ItemLog Stage 5 ready — all listeners + RestorationService")
     }
 
     override fun onDisable() {
