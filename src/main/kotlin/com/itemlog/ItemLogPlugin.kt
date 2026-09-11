@@ -1,6 +1,7 @@
 package com.itemlog
 
 import com.itemlog.db.DataSourceProvider
+import com.itemlog.listener.BlockItemListener
 import com.itemlog.listener.ConsumeDestroyListener
 import com.itemlog.listener.ContainerListener
 import com.itemlog.listener.CraftSmeltListener
@@ -8,6 +9,7 @@ import com.itemlog.listener.DeathListener
 import com.itemlog.listener.DropListener
 import com.itemlog.listener.InventoryListener
 import com.itemlog.listener.PickupListener
+import com.itemlog.service.EventDeduplicator
 import com.itemlog.repository.ItemEventRepository
 import com.itemlog.repository.MigrationRunner
 import com.itemlog.repository.RestorationRepository
@@ -44,6 +46,7 @@ class ItemLogPlugin : JavaPlugin() {
         itemLogService = ItemLogService(this, serializer, repository)
         restorationService = RestorationService(this, repository, restorationRepo, serializer)
         itemLogService.start()
+        val deduplicator = EventDeduplicator()
         server.pluginManager.registerEvents(PickupListener(itemLogService), this)
         server.pluginManager.registerEvents(DropListener(itemLogService), this)
         server.pluginManager.registerEvents(DeathListener(itemLogService, serializer), this)
@@ -51,7 +54,8 @@ class ItemLogPlugin : JavaPlugin() {
         server.pluginManager.registerEvents(CraftSmeltListener(itemLogService, serializer), this)
         server.pluginManager.registerEvents(InventoryListener(itemLogService, serializer), this)
         server.pluginManager.registerEvents(ConsumeDestroyListener(itemLogService, serializer), this)
-        logger.info("ItemLog Stage 6 ready — Inventory/Consume/Destroy listeners")
+        server.pluginManager.registerEvents(BlockItemListener(itemLogService, serializer, deduplicator), this)
+        logger.info("ItemLog Stage 7 ready — Block/Spawn + Deduplicator (crash-safe, ordering)")
     }
 
     override fun onDisable() {
