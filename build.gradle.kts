@@ -1,8 +1,8 @@
 plugins {
     kotlin("jvm") version "2.0.21"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
     idea
     id("com.diffplug.spotless") version "7.0.2"
+    // Shadow removed — manual fatJar to avoid ASM 65 on Java 21 (shadow 8.1.1 bug)
 }
 
 group = "com.itemlog"
@@ -55,14 +55,22 @@ tasks.jar {
     archiveBaseName.set("itemlog")
 }
 
-tasks.shadowJar {
+// Manual fatJar — bundles runtimeClasspath without shadow ASM
+val shadowJar by tasks.registering(Jar::class) {
     archiveBaseName.set("itemlog")
     archiveClassifier.set("")
-    mergeServiceFiles()
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from(sourceSets.main.get().output)
+    dependsOn(configurations.runtimeClasspath)
+    from({
+        configurations.runtimeClasspath.get()
+            .filter { it.name.endsWith("jar") }
+            .map { zipTree(it) }
+    })
 }
 
 tasks.build {
-    dependsOn(tasks.shadowJar)
+    dependsOn(shadowJar)
 }
 
 tasks.test {
