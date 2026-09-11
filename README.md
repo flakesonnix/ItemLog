@@ -1,16 +1,40 @@
 # ItemLog
 
-Paper 1.26.2 — Kotlin — logs item events for restore.
+Paper 1.26.2 — Kotlin — quiet backend that logs item events for later restore.
 
-Tracks: pickup, drop, inventory, container, death, craft, smelt, consume, destroy.
-
-Tables: `item_events`, `restorations`, `schema_migrations`.
+Tracks: pickup, drop, inventory, container, death, craft, smelt, consume, destroy. Stores `item_events`, `restorations`, `schema_migrations` via HikariCP (sqlite/mysql).
 
 ```bash
 gradle shadowJar
 # → build/libs/itemlog-1.0.0-SNAPSHOT.jar
 ```
 
-Config: `plugins/ItemLog/database.db` (sqlite) or MySQL.
+Just drop the jar in `plugins/` and restart — `plugins/ItemLog/database.db` is created automatically.
 
-Backend for ItemLogAdmin.
+## Config
+
+`plugins/ItemLog/config.yml`:
+
+```yaml
+database:
+  type: sqlite # or mysql
+  sqlite: { file: database.db }
+  mysql: { host: localhost, database: itemlog }
+```
+
+Switch type → restart. No code change.
+
+## How it works
+
+Listeners buffer events (deduped, ordered) → `ItemEventRepository` → DB. `ItemLogAdmin` reads the same DB to offer `/itemlog` GUI — no shared code, DB is the contract.
+
+## Dev
+
+```bash
+nix develop
+gradle shadowJar
+gradle test
+nix fmt
+```
+
+See `docs/` for architecture and retention.
