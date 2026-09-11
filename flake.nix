@@ -14,9 +14,15 @@
     flake-utils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ] (
       system:
       let
-        pkgs = import nixpkgs { inherit system; };
+        pkgs = import nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+        };
         jdk = pkgs.jdk21;
         gradle = pkgs.gradle_8;
+        ideaPkg = if pkgs.jetbrains ? idea then pkgs.jetbrains.idea else pkgs.jetbrains.idea-community;
+        nixFmt = pkgs.nixfmt;
+        ktlint = pkgs.ktlint;
       in
       {
         devShells.default = pkgs.mkShell {
@@ -24,11 +30,17 @@
             jdk
             gradle
             pkgs.git
-            pkgs.nixfmt
+            pkgs.bash
+            ideaPkg
+            nixFmt
+            ktlint
           ];
           shellHook = ''
             export JAVA_HOME=${jdk}
             echo "ItemLog — java $(java -version 2>&1 | head -n1) | gradle $(gradle --version | grep Gradle)"
+            echo "  gradle shadowJar        → build/libs/itemlog-1.0.0-SNAPSHOT.jar"
+            echo "  gradle spotlessCheck    → Kotlin fmt"
+            echo "  gradle idea             → generate .idea"
           '';
         };
         packages.default = pkgs.stdenv.mkDerivation {
@@ -51,7 +63,8 @@
             cp build/libs/*.jar $out/
           '';
         };
-        formatter = pkgs.nixfmt;
+        packages.idea = ideaPkg;
+        formatter = nixFmt;
       }
     );
 }
