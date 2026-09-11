@@ -5,15 +5,27 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ] (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+    }:
+    flake-utils.lib.eachSystem [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ] (
+      system:
       let
         pkgs = import nixpkgs { inherit system; };
         jdk = pkgs.jdk21;
         gradle = pkgs.gradle_8;
-      in {
+      in
+      {
         devShells.default = pkgs.mkShell {
-          buildInputs = [ jdk gradle pkgs.git pkgs.nixfmt ];
+          buildInputs = [
+            jdk
+            gradle
+            pkgs.git
+            pkgs.nixfmt
+          ];
           shellHook = ''
             export JAVA_HOME=${jdk}
             echo "ItemLog — java $(java -version 2>&1 | head -n1) | gradle $(gradle --version | grep Gradle)"
@@ -23,7 +35,11 @@
           pname = "itemlog";
           version = "1.0.0-SNAPSHOT";
           src = ./.;
-          nativeBuildInputs = [ jdk gradle pkgs.cacert ];
+          nativeBuildInputs = [
+            jdk
+            gradle
+            pkgs.cacert
+          ];
           __noChroot = true;
           buildPhase = ''
             export GRADLE_USER_HOME=$TMPDIR/.gradle
@@ -36,5 +52,6 @@
           '';
         };
         formatter = pkgs.nixfmt;
-      });
+      }
+    );
 }
