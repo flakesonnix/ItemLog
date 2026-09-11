@@ -1,6 +1,8 @@
 package com.itemlog
 
 import com.itemlog.db.DataSourceProvider
+import com.itemlog.listener.DropListener
+import com.itemlog.listener.PickupListener
 import com.itemlog.repository.ItemEventRepository
 import com.itemlog.repository.MigrationRunner
 import com.itemlog.serialization.ItemSerializer
@@ -31,7 +33,9 @@ class ItemLogPlugin : JavaPlugin() {
         val repository = ItemEventRepository(dataSource)
         itemLogService = ItemLogService(this, serializer, repository)
         itemLogService.start()
-        logger.info("ItemLog Stage 3 ready — service + buffer")
+        server.pluginManager.registerEvents(PickupListener(itemLogService), this)
+        server.pluginManager.registerEvents(DropListener(itemLogService), this)
+        logger.info("ItemLog Stage 4 ready — Pickup/Drop listeners")
     }
 
     override fun onDisable() {
