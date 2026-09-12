@@ -1,5 +1,6 @@
 package com.itemlog.listener
 
+import be.seeseemelk.mockbukkit.MockBukkit
 import com.itemlog.model.EventType
 import com.itemlog.serialization.ItemSerializer
 import com.itemlog.service.EventDeduplicator
@@ -7,6 +8,7 @@ import com.itemlog.service.ItemLogService
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import java.util.UUID
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World
@@ -16,9 +18,9 @@ import org.bukkit.entity.Player
 import org.bukkit.event.block.BlockDropItemEvent
 import org.bukkit.event.entity.ItemSpawnEvent
 import org.bukkit.inventory.ItemStack
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.UUID
 
 class BlockItemListenerTest {
 
@@ -29,14 +31,21 @@ class BlockItemListenerTest {
 
     @BeforeEach
     fun setup() {
+        // Boot mock server so Material/Registry/ItemStack behave like on a server
+        MockBukkit.mock()
         service = mockk(relaxed = true)
         serializer = mockk(relaxed = true)
         deduplicator = mockk(relaxed = true)
-        
+
         every { serializer.serialize(any()) } returns """{"type":"DIAMOND"}"""
         every { deduplicator.isDuplicate(any()) } returns false
-        
+
         listener = BlockItemListener(service, serializer, deduplicator)
+    }
+
+    @AfterEach
+    fun teardown() {
+        MockBukkit.unmock()
     }
 
     @Test
@@ -47,7 +56,7 @@ class BlockItemListenerTest {
 
         val world = mockk<World>(relaxed = true)
         every { world.name } returns "world"
-        
+
         val block = mockk<Block>(relaxed = true)
         every { block.type } returns Material.DIAMOND_ORE
         every { block.location } returns Location(world, 100.0, 64.0, 200.0)
@@ -65,11 +74,15 @@ class BlockItemListenerTest {
 
         listener.onBlockDrop(event)
 
-        verify { service.log(match { 
-            it.type == EventType.DESTROY && 
-            it.playerId == playerId &&
-            it.source?.contains("BLOCK_BREAK:DIAMOND_ORE") == true
-        }) }
+        verify {
+            service.log(
+                match {
+                    it.type == EventType.DESTROY &&
+                        it.playerId == playerId &&
+                        it.source?.contains("BLOCK_BREAK:DIAMOND_ORE") == true
+                },
+            )
+        }
     }
 
     @Test
@@ -79,7 +92,7 @@ class BlockItemListenerTest {
 
         val world = mockk<World>(relaxed = true)
         every { world.name } returns "world"
-        
+
         val block = mockk<Block>(relaxed = true)
         every { block.type } returns Material.CHEST
         every { block.location } returns Location(world, 0.0, 0.0, 0.0)
@@ -110,7 +123,7 @@ class BlockItemListenerTest {
 
         val world = mockk<World>(relaxed = true)
         every { world.name } returns "world"
-        
+
         val block = mockk<Block>(relaxed = true)
         every { block.type } returns Material.STONE
         every { block.location } returns Location(world, 0.0, 0.0, 0.0)
@@ -141,7 +154,7 @@ class BlockItemListenerTest {
 
         val world = mockk<World>(relaxed = true)
         every { world.name } returns "world"
-        
+
         val block = mockk<Block>(relaxed = true)
         every { block.type } returns Material.COAL_ORE
         every { block.location } returns Location(world, 0.0, 0.0, 0.0)
@@ -181,11 +194,15 @@ class BlockItemListenerTest {
 
         listener.onItemSpawn(event)
 
-        verify { service.log(match { 
-            it.type == EventType.OTHER &&
-            it.source == "ITEM_SPAWN" &&
-            it.playerId == null
-        }) }
+        verify {
+            service.log(
+                match {
+                    it.type == EventType.OTHER &&
+                        it.source == "ITEM_SPAWN" &&
+                        it.playerId == null
+                },
+            )
+        }
     }
 
     @Test

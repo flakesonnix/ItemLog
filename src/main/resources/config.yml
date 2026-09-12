@@ -9,3 +9,34 @@ database:
     user: root
     password: ""
     params: "useSSL=false&allowPublicKeyRetrieval=true"
+
+# Compression settings
+compression:
+  enabled: true  # Enable Gzip compression for JSON data (saves 60-80% database space)
+  min-size: 100  # Minimum bytes before compression is applied
+  min-ratio: 0.8  # Only use compression if it saves at least 20%
+
+# Buffer settings
+buffer:
+  flush-interval: 20  # Ticks between database writes (20 = 1 second)
+  batch-size: 100     # Max events per batch
+
+# Event tracking - disable specific event types if needed
+tracking:
+  pickup: true
+  drop: true
+  death: true
+  craft: true
+  smelt: true
+  container: true
+  inventory: true
+  consume: true
+  destroy: true
+  enchant: true    # New: Enchantment table
+  anvil: true      # New: Anvil repairs/renames
+  trading: true    # New: Villager/Wandering Trader trades
+
+# Performance settings
+performance:
+  async-writes: true     # Use async batch writing (recommended)
+  max-queue-size: 10000  # Max events in memory before blocking

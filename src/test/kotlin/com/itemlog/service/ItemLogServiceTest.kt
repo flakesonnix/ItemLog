@@ -7,6 +7,7 @@ import com.itemlog.serialization.ItemSerializer
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import java.util.UUID
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.Server
@@ -17,7 +18,6 @@ import org.bukkit.scheduler.BukkitScheduler
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.UUID
 
 class ItemLogServiceTest {
 
@@ -31,7 +31,7 @@ class ItemLogServiceTest {
         plugin = mockk(relaxed = true)
         serializer = mockk(relaxed = true)
         repository = mockk(relaxed = true)
-        
+
         val server = mockk<Server>(relaxed = true)
         val scheduler = mockk<BukkitScheduler>(relaxed = true)
         every { plugin.server } returns server
@@ -42,7 +42,7 @@ class ItemLogServiceTest {
         }
         every { plugin.logger } returns mockk(relaxed = true)
         every { serializer.serialize(any()) } returns """{"type":"DIAMOND","amount":1}"""
-        
+
         service = ItemLogService(plugin, serializer, repository)
     }
 
@@ -52,11 +52,11 @@ class ItemLogServiceTest {
         val world = mockk<World>(relaxed = true)
         every { world.name } returns "world"
         val location = Location(world, 100.0, 64.0, 200.0)
-        
+
         val item = mockk<ItemStack>(relaxed = true)
         every { item.type } returns Material.DIAMOND
         every { item.amount } returns 5
-        
+
         var capturedEvents: List<ItemEvent>? = null
         every { repository.insertBatch(any()) } answers {
             capturedEvents = arg(0)
@@ -69,7 +69,7 @@ class ItemLogServiceTest {
         verify { repository.insertBatch(any()) }
         assertNotNull(capturedEvents)
         val captured = capturedEvents!!.first()
-        
+
         assertEquals(EventType.PICKUP, captured.type)
         assertEquals(playerId, captured.playerId)
         assertEquals("world", captured.location?.world)
@@ -88,11 +88,11 @@ class ItemLogServiceTest {
         val world = mockk<World>(relaxed = true)
         every { world.name } returns "world"
         val location = Location(world, 50.0, 70.0, 150.0)
-        
+
         val item = mockk<ItemStack>(relaxed = true)
         every { item.type } returns Material.GOLD_INGOT
         every { item.amount } returns 10
-        
+
         var capturedEvents: List<ItemEvent>? = null
         every { repository.insertBatch(any()) } answers {
             capturedEvents = arg(0)
@@ -105,7 +105,7 @@ class ItemLogServiceTest {
         verify { repository.insertBatch(any()) }
         assertNotNull(capturedEvents)
         val captured = capturedEvents!!.first()
-        
+
         assertEquals(EventType.DROP, captured.type)
         assertEquals(playerId, captured.playerId)
         assertNotNull(captured.before)
@@ -125,14 +125,14 @@ class ItemLogServiceTest {
             location = null,
             before = null,
             after = mockk(relaxed = true),
-            source = "TEST"
+            source = "TEST",
         )
-        
+
         every { repository.insertBatch(any()) } returns Unit
-        
+
         service.log(event)
         service.flush()
-        
+
         verify { repository.insertBatch(match { it.contains(event) }) }
     }
 
@@ -142,15 +142,15 @@ class ItemLogServiceTest {
         val world = mockk<World>(relaxed = true)
         every { world.name } returns "world"
         val location = Location(world, 0.0, 0.0, 0.0)
-        
+
         val item = mockk<ItemStack>(relaxed = true)
         every { item.type } returns Material.DIAMOND_SWORD
         every { item.amount } returns 1
-        
+
         every { repository.insertBatch(any()) } returns Unit
-        
+
         service.logPickup(playerId, location, item)
-        
+
         verify { serializer.serialize(item) }
     }
 
@@ -160,27 +160,27 @@ class ItemLogServiceTest {
         val world = mockk<World>(relaxed = true)
         every { world.name } returns "world"
         val location = Location(world, 0.0, 0.0, 0.0)
-        
+
         val item1 = mockk<ItemStack>(relaxed = true)
         every { item1.type } returns Material.DIAMOND
         every { item1.amount } returns 1
-        
+
         val item2 = mockk<ItemStack>(relaxed = true)
         every { item2.type } returns Material.GOLD_INGOT
         every { item2.amount } returns 2
-        
+
         val item3 = mockk<ItemStack>(relaxed = true)
         every { item3.type } returns Material.IRON_INGOT
         every { item3.amount } returns 3
-        
+
         every { repository.insertBatch(any()) } returns Unit
-        
+
         service.logPickup(playerId, location, item1)
         service.logPickup(playerId, location, item2)
         service.logDrop(playerId, location, item3)
-        
+
         service.flush()
-        
+
         verify(exactly = 1) { repository.insertBatch(match { it.size == 3 }) }
     }
 
@@ -190,16 +190,16 @@ class ItemLogServiceTest {
         val server = mockk<Server>(relaxed = true)
         every { plugin.server } returns server
         every { server.scheduler } returns scheduler
-        
+
         val task = mockk<org.bukkit.scheduler.BukkitTask>(relaxed = true)
         every { task.taskId } returns 42
         every { scheduler.runTaskTimerAsynchronously(any<JavaPlugin>(), any<Runnable>(), any<Long>(), any<Long>()) } returns task
         every { scheduler.cancelTask(any()) } returns Unit
         every { repository.insertBatch(any()) } returns Unit
-        
+
         service.start()
         verify { scheduler.runTaskTimerAsynchronously(plugin, any<Runnable>(), any<Long>(), any<Long>()) }
-        
+
         service.stop()
         verify { scheduler.cancelTask(42) }
     }

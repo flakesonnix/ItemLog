@@ -1,9 +1,11 @@
 package com.itemlog.listener
 
+import be.seeseemelk.mockbukkit.MockBukkit
 import com.itemlog.service.ItemLogService
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import java.util.UUID
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World
@@ -12,9 +14,9 @@ import org.bukkit.entity.Player
 import org.bukkit.entity.Zombie
 import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.inventory.ItemStack
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.UUID
 
 class PickupListenerTest {
 
@@ -23,8 +25,15 @@ class PickupListenerTest {
 
     @BeforeEach
     fun setup() {
+        // Boot mock server so Material/Registry/ItemStack behave like on a server
+        MockBukkit.mock()
         service = mockk(relaxed = true)
         listener = PickupListener(service)
+    }
+
+    @AfterEach
+    fun teardown() {
+        MockBukkit.unmock()
     }
 
     @Test

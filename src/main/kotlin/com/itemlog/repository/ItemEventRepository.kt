@@ -4,6 +4,7 @@ import com.itemlog.model.EventType
 import com.itemlog.model.ItemEvent
 import com.itemlog.model.ItemSnapshot
 import com.itemlog.model.LocationData
+import com.itemlog.serialization.CompressionHelper
 import java.nio.ByteBuffer
 import java.util.UUID
 import javax.sql.DataSource
@@ -191,11 +192,15 @@ class ItemEventRepository(private val ds: DataSource) {
 
     private fun snapshotToJson(s: ItemSnapshot): String {
         // Simple JSON for snapshot: material|amount|itemJson
-        return "${s.material}|${s.amount}|${s.itemJson ?: ""}"
+        val json = "${s.material}|${s.amount}|${s.itemJson ?: ""}"
+        // Compress the JSON data to save database space
+        return CompressionHelper.compress(json) ?: json
     }
 
     private fun jsonToSnapshot(s: String): ItemSnapshot {
-        val parts = s.split("|", limit = 3)
+        // Decompress if needed (backward compatible with uncompressed data)
+        val decompressed = CompressionHelper.decompress(s) ?: s
+        val parts = decompressed.split("|", limit = 3)
         return ItemSnapshot(parts[0], parts[1].toInt(), parts.getOrNull(2)?.ifEmpty { null })
     }
 

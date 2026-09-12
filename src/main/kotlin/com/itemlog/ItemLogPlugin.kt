@@ -1,14 +1,17 @@
 package com.itemlog
 
 import com.itemlog.db.DataSourceProvider
+import com.itemlog.listener.AnvilListener
 import com.itemlog.listener.BlockItemListener
 import com.itemlog.listener.ConsumeDestroyListener
 import com.itemlog.listener.ContainerListener
 import com.itemlog.listener.CraftSmeltListener
 import com.itemlog.listener.DeathListener
 import com.itemlog.listener.DropListener
+import com.itemlog.listener.EnchantingListener
 import com.itemlog.listener.InventoryListener
 import com.itemlog.listener.PickupListener
+import com.itemlog.listener.TradingListener
 import com.itemlog.repository.ItemEventRepository
 import com.itemlog.repository.MigrationRunner
 import com.itemlog.repository.RestorationRepository
@@ -55,7 +58,10 @@ class ItemLogPlugin : JavaPlugin() {
         server.pluginManager.registerEvents(InventoryListener(itemLogService, serializer), this)
         server.pluginManager.registerEvents(ConsumeDestroyListener(itemLogService, serializer), this)
         server.pluginManager.registerEvents(BlockItemListener(itemLogService, serializer, deduplicator), this)
-        logger.info("ItemLog Stage 7 ready — Block/Spawn + Deduplicator (crash-safe, ordering)")
+        server.pluginManager.registerEvents(EnchantingListener(itemLogService, serializer), this)
+        server.pluginManager.registerEvents(AnvilListener(itemLogService, serializer), this)
+        server.pluginManager.registerEvents(TradingListener(itemLogService, serializer), this)
+        logger.info("ItemLog Stage 8 ready — All listeners + Trading/Enchanting/Anvil")
     }
 
     override fun onDisable() {

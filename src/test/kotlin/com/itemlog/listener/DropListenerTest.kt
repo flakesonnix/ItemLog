@@ -1,9 +1,11 @@
 package com.itemlog.listener
 
+import be.seeseemelk.mockbukkit.MockBukkit
 import com.itemlog.service.ItemLogService
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import java.util.UUID
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World
@@ -11,9 +13,9 @@ import org.bukkit.entity.Item
 import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.inventory.ItemStack
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.UUID
 
 class DropListenerTest {
 
@@ -22,8 +24,15 @@ class DropListenerTest {
 
     @BeforeEach
     fun setup() {
+        // Boot mock server so Material/Registry/ItemStack behave like on a server
+        MockBukkit.mock()
         service = mockk(relaxed = true)
         listener = DropListener(service)
+    }
+
+    @AfterEach
+    fun teardown() {
+        MockBukkit.unmock()
     }
 
     @Test
@@ -84,7 +93,7 @@ class DropListenerTest {
             every { itemStack.type } returns Material.DIAMOND
             every { itemStack.amount } returns i
             every { itemDrop.itemStack } returns itemStack
-            
+
             val event = PlayerDropItemEvent(player, itemDrop)
             listener.onDrop(event)
         }

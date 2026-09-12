@@ -7,7 +7,10 @@ class CompressionHelperTest {
 
     @Test
     fun `compress and decompress should work correctly`() {
-        val original = """{"type":"DIAMOND_SWORD","amount":1,"meta":{"displayName":"Epic Sword","lore":["Line 1","Line 2","Line 3"],"enchantments":[{"key":"sharpness","level":5},{"key":"unbreaking","level":3}]}}"""
+        // Large enough + repetitive enough that gzip clearly wins over the 20% threshold
+        val lore = (1..30).joinToString(",") { """"Lore line number $it with some repeated flavor text"""" }
+        val enchants = (1..10).joinToString(",") { """{"key":"sharpness","level":5}""" }
+        val original = """{"type":"DIAMOND_SWORD","amount":1,"meta":{"displayName":"Epic Sword","lore":[$lore],"enchantments":[$enchants]}}"""
 
         val compressed = CompressionHelper.compress(original)
         assertNotNull(compressed)
